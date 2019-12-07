@@ -11,6 +11,9 @@ use crossterm::{
     Result
 };
 
+pub mod engine;
+pub mod rendering;
+
 #[derive(Debug)]
 pub enum Event {
     QuitGame,
