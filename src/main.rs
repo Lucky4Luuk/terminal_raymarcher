@@ -1,4 +1,5 @@
 use std::io::{stdout, Write};
+use std::{thread, time};
 
 use crossterm::{
     execute,
@@ -12,7 +13,16 @@ use crossterm::{
 };
 
 pub mod engine;
+use engine::{
+    distance_field::*,
+    scene::Scene,
+};
+
 pub mod rendering;
+use rendering::{
+    screen::Screen,
+    raymarching as rm,
+};
 
 #[derive(Debug)]
 pub enum Event {
@@ -48,16 +58,33 @@ fn main() -> Result<()> {
         .execute(ResetColor)?
         .execute(cursor::DisableBlinking)?;
 
+    let mut screen = Screen::new(term_size);
+
+    // screen.buffer[0][0] = 'x';
+    // screen.buffer[(term_size.1 - 1) as usize][(term_size.0 - 1) as usize] = 'a';
+
+    screen.set((1, 1), 'x');
+    screen.set((term_size.0 - 1, term_size.1 - 1), 'a');
+
+    let mut scene = Scene::new();
+    let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 0.5);
+    scene.distance_fields.push(sphere);
+
     loop {
         match next_event(&mut stdin) {
             Some(Event::QuitGame) => break,
             _ => {}
         };
+
+        screen.render();
+        // break;
+
+        thread::sleep(time::Duration::from_millis(200));
     }
 
     stdout()
         .execute(SetForegroundColor(Color::Blue))?
-        .execute(Output("Thanks for playing!"))?
+        .execute(Output("Thanks for using!"))?
         .execute(cursor::EnableBlinking)?
         .execute(ResetColor)?;
 
