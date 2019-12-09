@@ -24,6 +24,11 @@ use rendering::{
     raymarching as rm,
 };
 
+extern crate vecmath as vmath;
+use vmath::{
+    Vector3,
+};
+
 #[derive(Debug)]
 pub enum Event {
     QuitGame,
@@ -76,8 +81,17 @@ fn main() -> Result<()> {
             _ => {}
         };
 
+        for py in 0.. term_size.1 {
+            for px in 0.. term_size.0 {
+                //Send out a ray
+                let fc = ((term_size.0 - px) as f32, (term_size.1 - py) as f32);
+                let p = ((-(term_size.0 as f32) + 2.0 * fc.0) / (term_size.1 as f32), (-(term_size.1 as f32) + 2.0 * fc.1) / (term_size.1 as f32));
+                let ray = rm::Ray::new([0.0, 0.0, 0.0], vmath::vec3_normalized([p.0, p.1, 2.0]));
+                screen.set((px, py), scene.march(ray));
+            }
+        }
+
         screen.render();
-        // break;
 
         thread::sleep(time::Duration::from_millis(200));
     }
