@@ -77,9 +77,12 @@ fn main() -> Result<()> {
         };
 
         screen.render();
-        // break;
 
-        thread::sleep(time::Duration::from_millis(200));
+        thread::sleep(time::Duration::from_millis(50)); //Tweak this if you get weird artifacts
+        //For me, anything less than 100 will get me artifacts, but 50 still has so little artifacts that it's worth the FPS.
+        //50ms = 20fps
+        //100ms = 10fps
+        //TODO: subtract the amount of time it took to generate the frame
     }
 
     stdout()
