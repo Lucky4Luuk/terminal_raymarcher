@@ -12,7 +12,7 @@ use crossterm::{
 };
 
 pub struct Screen {
-    pub buffer: Vec<Vec<char>>, //layout is y; x
+    pub buffer: Vec<Vec<(char, Color)>>, //layout is y; x
     pub size: (u16, u16),
 }
 
@@ -23,8 +23,8 @@ impl Screen {
         for y in 0.. term_size.1 {
             // println!("y: {}", y as usize);
             buffer.push(Vec::new());
-            for x in 0.. term_size.0 {
-                buffer[y as usize].push(' ');
+            for _x in 0.. term_size.0 {
+                buffer[y as usize].push((' ', Color::Reset));
             }
         }
 
@@ -34,15 +34,31 @@ impl Screen {
         }
     }
 
-    pub fn set(&mut self, pos: (u16, u16), value: char) {
+    pub fn set(&mut self, pos: (u16, u16), value: (char, Color)) {
         self.buffer[pos.1 as usize][pos.0 as usize] = value;
     }
 
+    //TODO: Error handling lol
     pub fn render(&self) {
+        // stdout()
+        //     .execute(terminal::Clear(terminal::ClearType::All)).unwrap();
         stdout()
-            .execute(terminal::Clear(terminal::ClearType::All)).unwrap();
+            .execute(cursor::MoveTo(0,0)).unwrap();
         for y in 0.. self.size.1 {
-            let mut s: String = self.buffer[y as usize].iter().collect();
+            // for x in 0.. self.size.0 {
+            //     let c = self.buffer[y as usize][x as usize];
+            //     stdout()
+            //         .execute(Output(c)).unwrap();
+            // }
+            // stdout()
+            //     .execute(Output('\n')).unwrap();
+            // let mut s: String = self.buffer[y as usize].iter().collect();
+            let mut s = String::new();
+            for x in 0.. self.size.0 {
+                let (value, color) = self.buffer[y as usize][x as usize];
+                s.push_str(&*format!("{}", SetForegroundColor(color)));
+                s.push(value);
+            }
             if y < self.size.1 - 1 {
                 s.push('\n');
             }

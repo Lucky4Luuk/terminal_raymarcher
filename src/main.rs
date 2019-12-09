@@ -68,12 +68,16 @@ fn main() -> Result<()> {
     // screen.buffer[0][0] = 'x';
     // screen.buffer[(term_size.1 - 1) as usize][(term_size.0 - 1) as usize] = 'a';
 
-    screen.set((1, 1), 'x');
-    screen.set((term_size.0 - 1, term_size.1 - 1), 'a');
+    // screen.set((1, 1), 'x');
+    // screen.set((term_size.0 - 1, term_size.1 - 1), 'a');
 
     let mut scene = Scene::new();
-    let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 0.5);
+    let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 0.5, [255, 0, 0]);
     scene.distance_fields.push(sphere);
+    let plane = SDF::new_plane(-0.5, [255, 255, 255]);
+    scene.distance_fields.push(plane);
+    // let cube = SDF::new_cube([0.0, 0.0, 5.0], [0.5, 0.5, 0.5]);
+    // scene.distance_fields.push(cube);
 
     loop {
         match next_event(&mut stdin) {
@@ -86,14 +90,15 @@ fn main() -> Result<()> {
                 //Send out a ray
                 let fc = ((term_size.0 - px) as f32, (term_size.1 - py) as f32);
                 let p = ((-(term_size.0 as f32) + 2.0 * fc.0) / (term_size.1 as f32), (-(term_size.1 as f32) + 2.0 * fc.1) / (term_size.1 as f32));
-                let ray = rm::Ray::new([0.0, 0.0, 0.0], vmath::vec3_normalized([p.0, p.1, 2.0]));
+                let ray = rm::Ray::new([0.0, 0.0, 0.0], vmath::vec3_normalized([p.0 * 0.5, p.1, 2.0]));
                 screen.set((px, py), scene.march(ray));
             }
         }
 
         screen.render();
 
-        thread::sleep(time::Duration::from_millis(50)); //Tweak this if you get weird artifacts
+        // thread::sleep(time::Duration::from_millis(50));
+        //Tweak this if you get weird artifacts
         //For me, anything less than 100 will get me artifacts, but 50 still has so little artifacts that it's worth the FPS.
         //50ms = 20fps
         //100ms = 10fps
