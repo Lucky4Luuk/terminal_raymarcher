@@ -1,5 +1,10 @@
 use std::io::{stdout, Write};
 
+use std::error::Error;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+
 use crossterm::{
     execute,
     terminal,
@@ -45,13 +50,7 @@ impl Screen {
         stdout()
             .execute(cursor::MoveTo(0,0)).unwrap();
         for y in 0.. self.size.1 {
-            // for x in 0.. self.size.0 {
-            //     let c = self.buffer[y as usize][x as usize];
-            //     stdout()
-            //         .execute(Output(c)).unwrap();
-            // }
-            // stdout()
-            //     .execute(Output('\n')).unwrap();
+            //Following commented line allows for very fast grayscale output, if the type if char and not (char, Color)
             // let mut s: String = self.buffer[y as usize].iter().collect();
             let mut s = String::new();
             for x in 0.. self.size.0 {

@@ -95,7 +95,23 @@ impl Scene {
             let normal = self.get_normal(ray.position);
             // println!("normal: {:?}", normal);
 
-            return ('█', lambert( Color::Rgb{r: sdf.colour[0], g: sdf.colour[1], b: sdf.colour[2]}, normal, vmath::vec3_normalized([0.25, -0.5, 0.5]) ));
+            let color = lambert( Color::Rgb{r: sdf.colour[0], g: sdf.colour[1], b: sdf.colour[2]}, normal, vmath::vec3_normalized([0.25, -0.5, 0.5]));
+
+            let mut intensity = clamp(vmath::vec3_dot(normal, vmath::vec3_neg(vmath::vec3_normalized([0.25, -0.5, 0.5]))), 0.0, 1.0);
+            intensity *= clamp(vmath::vec3_dot(normal, vmath::vec3_neg(vmath::vec3_normalized(ray.direction))), 0.0, 1.0);
+            let mut value = 'X';
+            let gradient = [':', ';', '=', '1', '%', 'X', '#'];
+            let gradient_idx = (intensity * gradient.len() as f32) as usize;
+            value = gradient[gradient_idx];
+            // if intensity < 0.25 {
+            //     value = '=';
+            // } else if intensity < 0.5 {
+            //     value = '+';
+            // } else if intensity < 0.75 {
+            //     value = '&';
+            // }
+
+            return (value, color);
         }
         // return ('x', Color::Rgb{r: clamp(-normal[0] * 255.0, 0.0, 255.0) as u8, g: clamp(-normal[1] * 255.0, 0.0, 255.0) as u8, b: clamp(-normal[2] * 255.0, 0.0, 255.0) as u8});
 
