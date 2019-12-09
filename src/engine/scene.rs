@@ -95,7 +95,7 @@ impl Scene {
             let normal = self.get_normal(ray.position);
             // println!("normal: {:?}", normal);
 
-            return ('x', lambert( Color::Rgb{r: sdf.colour[0], g: sdf.colour[1], b: sdf.colour[2]}, normal, vmath::vec3_normalized([0.25, -0.5, 0.5]) ));
+            return ('█', lambert( Color::Rgb{r: sdf.colour[0], g: sdf.colour[1], b: sdf.colour[2]}, normal, vmath::vec3_normalized([0.25, -0.5, 0.5]) ));
         }
         // return ('x', Color::Rgb{r: clamp(-normal[0] * 255.0, 0.0, 255.0) as u8, g: clamp(-normal[1] * 255.0, 0.0, 255.0) as u8, b: clamp(-normal[2] * 255.0, 0.0, 255.0) as u8});
 
