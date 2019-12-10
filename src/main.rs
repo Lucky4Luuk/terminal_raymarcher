@@ -77,11 +77,37 @@ fn main() -> Result<()> {
 
     let mut screen = Screen::new(term_size);
 
-    // screen.buffer[0][0] = 'x';
-    // screen.buffer[(term_size.1 - 1) as usize][(term_size.0 - 1) as usize] = 'a';
+    for y in 0.. term_size.1 {
+        for x in 0.. term_size.0 {
+            let value = 'x';
+            screen.set((x, y), (value, Color::White));
+            screen.set_bg((x, y), Color::Blue);
+        }
+    }
+    screen.render();
+    thread::sleep(std::time::Duration::from_secs(4));
+    screen.flush(term_size, (Color::Reset, Color::Reset));
 
-    // screen.set((1, 1), 'x');
-    // screen.set((term_size.0 - 1, term_size.1 - 1), 'a');
+    let header = "!== terminal_raymarcher v1.0 ";
+    let mut idx = 0;
+    for c in header.chars() {
+        screen.set((idx, 0), (c, Color::Red));
+        idx += 1;
+        if idx >= term_size.0 {
+            break;
+        }
+    }
+    if idx < term_size.0 {
+        for i in idx..term_size.0 {
+            if i < term_size.0 - 1 {
+                screen.set((i, 0), ('=', Color::Red));
+            } else if i == term_size.0 - 1 {
+                screen.set((i, 0), ('!', Color::Red));
+            } else {
+                break;
+            }
+        }
+    }
 
     let mut scene = Scene::new();
     let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 1.0, [255, 0, 0]);
@@ -99,7 +125,8 @@ fn main() -> Result<()> {
             _ => {}
         };
 
-        for py in 0.. term_size.1 {
+        //Start at 1 so we have a single line as a header
+        for py in 1.. term_size.1 {
             for px in 0.. term_size.0 {
                 //Send out a ray
                 let ray = scene.generate_ray(term_size, px, py);

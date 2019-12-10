@@ -17,7 +17,7 @@ use crossterm::{
 };
 
 pub struct Screen {
-    pub buffer: Vec<Vec<(char, Color)>>, //layout is y; x
+    pub buffer: Vec<Vec<(char, Color, Color)>>, //layout is y; x
     pub size: (u16, u16),
 }
 
@@ -29,7 +29,7 @@ impl Screen {
             // println!("y: {}", y as usize);
             buffer.push(Vec::new());
             for _x in 0.. term_size.0 {
-                buffer[y as usize].push((' ', Color::Reset));
+                buffer[y as usize].push((' ', Color::Reset, Color::Reset));
             }
         }
 
@@ -39,8 +39,25 @@ impl Screen {
         }
     }
 
+    pub fn flush(&mut self, term_size: (u16, u16), colors: (Color, Color)) {
+        self.buffer = Vec::new();
+
+        for y in 0.. term_size.1 {
+            // println!("y: {}", y as usize);
+            self.buffer.push(Vec::new());
+            for _x in 0.. term_size.0 {
+                self.buffer[y as usize].push((' ', colors.0, colors.1));
+            }
+        }
+    }
+
     pub fn set(&mut self, pos: (u16, u16), value: (char, Color)) {
-        self.buffer[pos.1 as usize][pos.0 as usize] = value;
+        self.buffer[pos.1 as usize][pos.0 as usize].0 = value.0;
+        self.buffer[pos.1 as usize][pos.0 as usize].1 = value.1;
+    }
+
+    pub fn set_bg(&mut self, pos: (u16, u16), bg_col: Color) {
+        self.buffer[pos.1 as usize][pos.0 as usize].2 = bg_col;
     }
 
     //TODO: Error handling lol
@@ -55,7 +72,8 @@ impl Screen {
             // let mut s: String = self.buffer[y as usize].iter().collect();
             // let mut s = String::new();
             for x in 0.. self.size.0 {
-                let (value, color) = self.buffer[y as usize][x as usize];
+                let (value, color, bg_col) = self.buffer[y as usize][x as usize];
+                s.push_str(&*format!("{}", SetBackgroundColor(bg_col)));
                 s.push_str(&*format!("{}", SetForegroundColor(color)));
                 s.push(value);
             }
