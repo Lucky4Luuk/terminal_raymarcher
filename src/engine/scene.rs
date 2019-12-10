@@ -30,7 +30,7 @@ impl Scene {
     pub fn new() -> Scene {
         Scene {
             distance_fields: Vec::new(),
-            camera: Camera::new([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], 0.0),
+            camera: Camera::new([0.0, 0.0, 0.0], 0.0, 0.0),
         }
     }
 
@@ -40,8 +40,7 @@ impl Scene {
 
         for i in 0.. self.distance_fields.len() {
             let dist = self.distance_fields[i].get_distance(position);
-            // println!("gamer time: {}", dist);
-            //Need to write this dumb line, so rust doesn't shit itself.
+            //Need to write this dumb code, so rust doesn't shit itself.
             //Apparently std::cmp::min requires the Ord trait, which isn't implemented for any floats.
             // closest_distance = if dist < closest_distance {dist} else {closest_distance};
             if dist < closest_distance {
@@ -74,6 +73,20 @@ impl Scene {
         );
     }
 
+    pub fn generate_ray(&self, term_size: (u16, u16), px: u16, py: u16) -> Ray {
+        let fc = ((term_size.0 - px) as f32, (term_size.1 - py) as f32);
+        let p = ((-(term_size.0 as f32) + 2.0 * fc.0) / (term_size.1 as f32), (-(term_size.1 as f32) + 2.0 * fc.1) / (term_size.1 as f32));
+        let mut ray = Ray::new([0.0, 0.0, 0.0], vmath::vec3_normalized([p.0 * 0.5, p.1, 2.0]));
+
+        let r = self.camera.yaw / 180.0 * 3.14;
+        let dx = ray.direction[0] * r.cos() - ray.direction[2] * r.sin();
+        let dy = ray.direction[2] * r.cos() + ray.direction[0] * r.sin();
+        ray.direction[0] = dx;
+        ray.direction[2] = dy;
+
+        return ray;
+    }
+
     pub fn march(&self, mut ray: Ray) -> (char, Color) {
         let (mut dist, mut idx) = self.get_distance(ray.position);
 
@@ -99,9 +112,9 @@ impl Scene {
 
             let mut intensity = clamp(vmath::vec3_dot(normal, vmath::vec3_neg(vmath::vec3_normalized([0.25, -0.5, 0.5]))), 0.0, 1.0);
             intensity *= clamp(vmath::vec3_dot(normal, vmath::vec3_neg(vmath::vec3_normalized(ray.direction))), 0.0, 1.0);
-            let mut value = 'X';
-            let gradient = [':', ';', '=', '1', '%', 'X', '#'];
-            let gradient_idx = (intensity * gradient.len() as f32) as usize;
+            let mut value = ' ';
+            let gradient = [':', ';', '1', '?', '%', 'X', '#', '@'];
+            let gradient_idx = (intensity * (gradient.len() + 1) as f32) as usize;
             value = gradient[gradient_idx];
             // if intensity < 0.25 {
             //     value = '=';

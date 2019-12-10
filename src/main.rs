@@ -31,6 +31,7 @@ use vmath::{
 
 #[derive(Debug)]
 pub enum Event {
+    HandleInput(KeyEvent),
     QuitGame,
 }
 
@@ -46,15 +47,26 @@ fn next_event(reader: &mut AsyncReader) -> Option<Event> {
             //     }
             // }
             InputEvent::Keyboard(KeyEvent::Esc) => return Some(Event::QuitGame),
+            InputEvent::Keyboard(key) => return Some(Event::HandleInput(key)),
             _ => {}
         }
     }
     None
 }
 
+fn handle_input(scene: &mut Scene, key: KeyEvent) {
+    if key == KeyEvent::Char('d') {
+        scene.camera.yaw += 2.0;
+    }
+    if key == KeyEvent::Char('a') {
+        scene.camera.yaw -= 2.0;
+    }
+}
+
 fn main() -> Result<()> {
     let term_size: (u16, u16) = terminal::size()?;
 
+    let _raw = crossterm::screen::RawScreen::into_raw_mode();
     let mut stdin = input().read_async();
 
     stdout()
@@ -72,37 +84,30 @@ fn main() -> Result<()> {
     // screen.set((term_size.0 - 1, term_size.1 - 1), 'a');
 
     let mut scene = Scene::new();
-    let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 0.5, [255, 0, 0]);
+    let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 1.0, [255, 0, 0]);
     scene.distance_fields.push(sphere);
-    let plane = SDF::new_plane(-0.5, [255, 255, 255]);
+    let plane = SDF::new_plane(-1.0, [255, 255, 255]);
     scene.distance_fields.push(plane);
     // let cube = SDF::new_cube([0.0, 0.0, 5.0], [0.5, 0.5, 0.5]);
     // scene.distance_fields.push(cube);
 
-    loop {
+    //TODO: measure deltatime
+    'main: loop {
         match next_event(&mut stdin) {
-            Some(Event::QuitGame) => break,
+            Some(Event::HandleInput(key)) => handle_input(&mut scene, key),
+            Some(Event::QuitGame) => break 'main,
             _ => {}
         };
 
         for py in 0.. term_size.1 {
             for px in 0.. term_size.0 {
                 //Send out a ray
-                let fc = ((term_size.0 - px) as f32, (term_size.1 - py) as f32);
-                let p = ((-(term_size.0 as f32) + 2.0 * fc.0) / (term_size.1 as f32), (-(term_size.1 as f32) + 2.0 * fc.1) / (term_size.1 as f32));
-                let ray = rm::Ray::new([0.0, 0.0, 0.0], vmath::vec3_normalized([p.0 * 0.5, p.1, 2.0]));
+                let ray = scene.generate_ray(term_size, px, py);
                 screen.set((px, py), scene.march(ray));
             }
         }
 
         screen.render();
-
-        // thread::sleep(time::Duration::from_millis(50));
-        //Tweak this if you get weird artifacts
-        //For me, anything less than 100 will get me artifacts, but 50 still has so little artifacts that it's worth the FPS.
-        //50ms = 20fps
-        //100ms = 10fps
-        //TODO: subtract the amount of time it took to generate the frame
     }
 
     stdout()

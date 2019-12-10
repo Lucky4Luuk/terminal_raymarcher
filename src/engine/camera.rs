@@ -5,15 +5,15 @@ use vmath::{
 
 pub struct Camera {
     pub eye: Vector3<f32>,
-    pub forward: Vector3<f32>,
+    pub yaw: f32,
     pub roll: f32,
 }
 
 impl Camera {
-    pub fn new(eye: Vector3<f32>, forward: Vector3<f32>, roll: f32) -> Camera {
+    pub fn new(eye: Vector3<f32>, yaw: f32, roll: f32) -> Camera {
         Camera {
             eye: eye,
-            forward: forward,
+            yaw: yaw,
             roll: roll,
         }
     }
