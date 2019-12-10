@@ -15,6 +15,8 @@ use crate::rendering::{
 
 use crossterm::style::Color;
 
+const MAX_STEPS: usize = 64;
+
 fn clamp(x: f32, a: f32, b: f32) -> f32 {
     if x < a { return a };
     if x > b { return b };
@@ -89,15 +91,17 @@ impl Scene {
 
     pub fn march(&self, mut ray: Ray) -> (char, Color) {
         let (mut dist, mut idx) = self.get_distance(ray.position);
+        let mut steps = 0;
 
-        while dist > 0.1 {
-            if dist >= 128.0 {
+        while dist > 0.1 && steps < MAX_STEPS {
+            if dist >= 64.0 {
                 return (' ', Color::Red);
             }
             ray.step(dist);
             let (_dist, _idx) = self.get_distance(ray.position);
             dist = _dist;
             idx = _idx;
+            steps += 1;
         }
 
         // return ('x', Color::Red);
