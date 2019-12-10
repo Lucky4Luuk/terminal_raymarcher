@@ -36,7 +36,7 @@ pub enum Event {
 }
 
 fn next_event(reader: &mut AsyncReader) -> Option<Event> {
-    while let Some(event) = reader.next() {
+    if let Some(event) = reader.next() {
         match event {
             //Example code commented out
             // InputEvent::Keyboard(key) => {
@@ -66,9 +66,6 @@ fn handle_input(scene: &mut Scene, key: KeyEvent) {
 fn main() -> Result<()> {
     let term_size: (u16, u16) = terminal::size()?;
 
-    let _raw = crossterm::screen::RawScreen::into_raw_mode();
-    let mut stdin = input().read_async();
-
     stdout()
         .execute(SetForegroundColor(Color::Blue))?
         .execute(Output(format!("========DEBUG========\nTerm size: [{}; {}]\n=====================\n", term_size.0, term_size.1)))?
@@ -77,15 +74,22 @@ fn main() -> Result<()> {
 
     let mut screen = Screen::new(term_size);
 
-    for y in 0.. term_size.1 {
+    for y in 0.. term_size.1 - 1 {
         for x in 0.. term_size.0 {
-            let value = 'x';
-            screen.set((x, y), (value, Color::White));
-            screen.set_bg((x, y), Color::Blue);
+            let mut value = ' ';
+            if x % 2 == y % 2 { value = '/' }
+            if x % 8 == y % 8 { value = '\\'}
+            if x == 0 || x == term_size.0 - 1 { value = '|' }
+            // if y == 0 || y == term_size.1 - 1 { value = '-' }
+            screen.set((x, y), (value, Color::Grey));
+            screen.set_bg((x, y), Color::Black);
         }
     }
+    for (i, c) in "loading assets...".chars().enumerate() {
+        screen.set((i as u16, term_size.1 - 1), (c, Color::Grey));
+    }
     screen.render();
-    thread::sleep(std::time::Duration::from_secs(4));
+    thread::sleep(std::time::Duration::from_secs(4)); //TODO: Get rid of this, but we need this now to test the loading screen as we have nothing to load yet lol
     screen.flush(term_size, (Color::Reset, Color::Reset));
 
     let header = "!== terminal_raymarcher v1.0 ";
@@ -109,6 +113,9 @@ fn main() -> Result<()> {
         }
     }
 
+    let _raw = crossterm::screen::RawScreen::into_raw_mode();
+    let mut stdin = input().read_async();
+
     let mut scene = Scene::new();
     let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 1.0, [255, 0, 0]);
     scene.distance_fields.push(sphere);
@@ -119,11 +126,13 @@ fn main() -> Result<()> {
 
     //TODO: measure deltatime
     'main: loop {
-        match next_event(&mut stdin) {
-            Some(Event::HandleInput(key)) => handle_input(&mut scene, key),
-            Some(Event::QuitGame) => break 'main,
-            _ => {}
-        };
+        while let Some(event) = next_event(&mut stdin) {
+            match event {
+                Event::HandleInput(key) => handle_input(&mut scene, key),
+                Event::QuitGame => break 'main,
+                _ => {}
+            };
+        }
 
         //Start at 1 so we have a single line as a header
         for py in 1.. term_size.1 {
