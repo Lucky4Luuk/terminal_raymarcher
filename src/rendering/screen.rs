@@ -49,10 +49,11 @@ impl Screen {
         //     .execute(terminal::Clear(terminal::ClearType::All)).unwrap();
         stdout()
             .execute(cursor::MoveTo(0,0)).unwrap();
+        let mut s = String::new();
         for y in 0.. self.size.1 {
             //Following commented line allows for very fast grayscale output, if the type if char and not (char, Color)
             // let mut s: String = self.buffer[y as usize].iter().collect();
-            let mut s = String::new();
+            // let mut s = String::new();
             for x in 0.. self.size.0 {
                 let (value, color) = self.buffer[y as usize][x as usize];
                 s.push_str(&*format!("{}", SetForegroundColor(color)));
@@ -61,8 +62,10 @@ impl Screen {
             if y < self.size.1 - 1 {
                 s.push('\n');
             }
-            stdout()
-                .execute(Output(s)).unwrap();
+            // stdout()
+            //     .execute(Output(s)).unwrap();
         }
+        stdout()
+            .execute(Output(s)).unwrap();
     }
 }
