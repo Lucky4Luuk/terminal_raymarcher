@@ -5,7 +5,7 @@ use crossterm::{
     execute,
     terminal,
     cursor,
-    input::{input, AsyncReader, InputEvent, KeyEvent},
+    input::{input, AsyncReader, InputEvent, KeyEvent, MouseEvent, MouseButton},
     ExecutableCommand,
     style::{Attribute, Color, SetForegroundColor, SetBackgroundColor, ResetColor},
     Output,
@@ -32,22 +32,16 @@ use vmath::{
 #[derive(Debug)]
 pub enum Event {
     HandleInput(KeyEvent),
+    HandleMouse(MouseEvent),
     QuitGame,
 }
 
 fn next_event(reader: &mut AsyncReader) -> Option<Event> {
     if let Some(event) = reader.next() {
         match event {
-            //Example code commented out
-            // InputEvent::Keyboard(key) => {
-            //     if let Ok(new_direction) = Direction::try_from(key) {
-            //         if snake_direction.can_change_to(new_direction) {
-            //             return Some(Event::UpdateSnakeDirection(new_direction));
-            //         }
-            //     }
-            // }
             InputEvent::Keyboard(KeyEvent::Esc) => return Some(Event::QuitGame),
             InputEvent::Keyboard(key) => return Some(Event::HandleInput(key)),
+            InputEvent::Mouse(mouse) => return Some(Event::HandleMouse(mouse)),
             _ => {}
         }
     }
@@ -60,6 +54,13 @@ fn handle_input(scene: &mut Scene, key: KeyEvent) {
     }
     if key == KeyEvent::Char('a') {
         scene.camera.yaw -= 2.0;
+    }
+}
+
+fn handle_mouse(scene: &mut Scene, mouse: MouseEvent) {
+    scene.camera.yaw += 45.0;
+    if mouse == MouseEvent::Press(MouseButton::Left, 1, 1) {
+        scene.camera.yaw += 45.0;
     }
 }
 
@@ -115,6 +116,7 @@ fn main() -> Result<()> {
 
     let _raw = crossterm::screen::RawScreen::into_raw_mode();
     let mut stdin = input().read_async();
+    let _mouse_mode = input().enable_mouse_mode()?;
 
     let mut scene = Scene::new();
     let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 1.0, [255, 0, 0]);
@@ -129,6 +131,7 @@ fn main() -> Result<()> {
         while let Some(event) = next_event(&mut stdin) {
             match event {
                 Event::HandleInput(key) => handle_input(&mut scene, key),
+                Event::HandleMouse(mouse) => handle_mouse(&mut scene, mouse),
                 Event::QuitGame => break 'main,
                 _ => {}
             };
