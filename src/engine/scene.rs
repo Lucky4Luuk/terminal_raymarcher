@@ -90,8 +90,8 @@ impl Scene {
     pub fn march(&self, mut ray: Ray) -> (char, Color) {
         let (mut dist, mut idx) = self.get_distance(ray.position);
 
-        while dist > 0.05 {
-            if dist == 4096.0 {
+        while dist > 0.1 {
+            if dist >= 128.0 {
                 return (' ', Color::Red);
             }
             ray.step(dist);
