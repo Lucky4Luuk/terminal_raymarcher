@@ -81,7 +81,7 @@ impl Scene {
         let r = self.camera.yaw / 180.0 * 3.14;
         let dx = ray.direction[0] * r.cos() - ray.direction[2] * r.sin();
         let dy = ray.direction[2] * r.cos() + ray.direction[0] * r.sin();
-        ray.direction[0] = dx;
+        ray.direction[0] = -dx;
         ray.direction[2] = dy;
 
         return ray;

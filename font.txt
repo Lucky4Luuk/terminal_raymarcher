@@ -1,0 +1,643 @@
+
+
+
+
+
+
+  aaaaaaaaaaaaa
+  a::::::::::::a
+  aaaaaaaaa:::::a
+           a::::a
+    aaaaaaa:::::a
+  aa::::::::::::a
+ a::::aaaa::::::a
+a::::a    a:::::a
+a::::a    a:::::a
+a:::::aaaa::::::a
+ a::::::::::aa:::a
+  aaaaaaaaaa  aaaa
+
+
+
+
+
+
+
+
+bbbbbbbb
+b::::::b
+b::::::b
+b::::::b
+ b:::::b
+ b:::::bbbbbbbbb
+ b::::::::::::::bb
+ b::::::::::::::::b
+ b:::::bbbbb:::::::b
+ b:::::b    b::::::b
+ b:::::b     b:::::b
+ b:::::b     b:::::b
+ b:::::b     b:::::b
+ b:::::bbbbbb::::::b
+ b::::::::::::::::b
+ b:::::::::::::::b
+ bbbbbbbbbbbbbbbb
+
+
+
+
+
+
+
+
+
+
+
+
+
+    cccccccccccccccc
+  cc:::::::::::::::c
+ c:::::::::::::::::c
+c:::::::cccccc:::::c
+c::::::c     ccccccc
+c:::::c
+c:::::c
+c::::::c     ccccccc
+c:::::::cccccc:::::c
+ c:::::::::::::::::c
+  cc:::::::::::::::c
+    cccccccccccccccc
+
+
+
+
+
+
+
+
+            dddddddd
+            d::::::d
+            d::::::d
+            d::::::d
+            d:::::d
+    ddddddddd:::::d
+  dd::::::::::::::d
+ d::::::::::::::::d
+d:::::::ddddd:::::d
+d::::::d    d:::::d
+d:::::d     d:::::d
+d:::::d     d:::::d
+d:::::d     d:::::d
+d::::::ddddd::::::dd
+ d:::::::::::::::::d
+  d:::::::::ddd::::d
+   ddddddddd   ddddd
+
+
+
+
+
+
+
+
+
+
+
+
+
+    eeeeeeeeeeee
+  ee::::::::::::ee
+ e::::::eeeee:::::ee
+e::::::e     e:::::e
+e:::::::eeeee::::::e
+e:::::::::::::::::e
+e::::::eeeeeeeeeee
+e:::::::e
+e::::::::e
+ e::::::::eeeeeeee
+  ee:::::::::::::e
+    eeeeeeeeeeeeee
+
+
+
+
+
+
+
+
+
+    ffffffffffffffff
+   f::::::::::::::::f
+  f::::::::::::::::::f
+  f::::::fffffff:::::f
+  f:::::f       ffffff
+  f:::::f
+ f:::::::ffffff
+ f::::::::::::f
+ f::::::::::::f
+ f:::::::ffffff
+  f:::::f
+  f:::::f
+ f:::::::f
+ f:::::::f
+ f:::::::f
+ fffffffff
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ggggggggg   ggggg
+  g:::::::::ggg::::g
+ g:::::::::::::::::g
+g::::::ggggg::::::gg
+g:::::g     g:::::g
+g:::::g     g:::::g
+g:::::g     g:::::g
+g::::::g    g:::::g
+g:::::::ggggg:::::g
+ g::::::::::::::::g
+  gg::::::::::::::g
+    gggggggg::::::g
+            g:::::g
+gggggg      g:::::g
+g:::::gg   gg:::::g
+ g::::::ggg:::::::g
+  gg:::::::::::::g
+    ggg::::::ggg
+       gggggg
+
+
+hhhhhhh
+h:::::h
+h:::::h
+h:::::h
+ h::::h hhhhh
+ h::::hh:::::hhh
+ h::::::::::::::hh
+ h:::::::hhh::::::h
+ h::::::h   h::::::h
+ h:::::h     h:::::h
+ h:::::h     h:::::h
+ h:::::h     h:::::h
+ h:::::h     h:::::h
+ h:::::h     h:::::h
+ h:::::h     h:::::h
+ hhhhhhh     hhhhhhh
+
+
+
+
+
+
+
+
+
+  iiii
+ i::::i
+  iiii
+
+iiiiiii
+i:::::i
+ i::::i
+ i::::i
+ i::::i
+ i::::i
+ i::::i
+ i::::i
+i::::::i
+i::::::i
+i::::::i
+iiiiiiii
+
+
+
+
+
+
+
+
+
+             jjjj
+            j::::j
+             jjjj
+
+           jjjjjjj
+           j:::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+            j::::j
+  jjjj      j::::j
+ j::::jj   j:::::j
+ j::::::jjj::::::j
+  jj::::::::::::j
+    jjj::::::jjj
+       jjjjjj
+
+
+kkkkkkkk
+k::::::k
+k::::::k
+k::::::k
+ k:::::k    kkkkkkk
+ k:::::k   k:::::k
+ k:::::k  k:::::k
+ k:::::k k:::::k
+ k::::::k:::::k
+ k:::::::::::k
+ k:::::::::::k
+ k::::::k:::::k
+k::::::k k:::::k
+k::::::k  k:::::k
+k::::::k   k:::::k
+kkkkkkkk    kkkkkkk
+
+
+
+
+
+
+
+
+
+lllllll
+l:::::l
+l:::::l
+l:::::l
+ l::::l
+ l::::l
+ l::::l
+ l::::l
+ l::::l
+ l::::l
+ l::::l
+ l::::l
+l::::::l
+l::::::l
+l::::::l
+llllllll
+
+
+
+
+
+
+
+
+
+
+
+
+
+   mmmmmmm    mmmmmmm
+ mm:::::::m  m:::::::mm
+m::::::::::mm::::::::::m
+m::::::::::::::::::::::m
+m:::::mmm::::::mmm:::::m
+m::::m   m::::m   m::::m
+m::::m   m::::m   m::::m
+m::::m   m::::m   m::::m
+m::::m   m::::m   m::::m
+m::::m   m::::m   m::::m
+m::::m   m::::m   m::::m
+mmmmmm   mmmmmm   mmmmmm
+
+
+
+
+
+
+
+
+
+
+
+
+
+nnnn  nnnnnnnn
+n:::nn::::::::nn
+n::::::::::::::nn
+nn:::::::::::::::n
+  n:::::nnnn:::::n
+  n::::n    n::::n
+  n::::n    n::::n
+  n::::n    n::::n
+  n::::n    n::::n
+  n::::n    n::::n
+  n::::n    n::::n
+  nnnnnn    nnnnnn
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ooooooooooo
+ oo:::::::::::oo
+o:::::::::::::::o
+o:::::ooooo:::::o
+o::::o     o::::o
+o::::o     o::::o
+o::::o     o::::o
+o::::o     o::::o
+o:::::ooooo:::::o
+o:::::::::::::::o
+ oo:::::::::::oo
+   ooooooooooo
+
+
+
+
+
+
+
+
+
+
+
+
+
+ppppp   ppppppppp
+p::::ppp:::::::::p
+p:::::::::::::::::p
+pp::::::ppppp::::::p
+ p:::::p     p:::::p
+ p:::::p     p:::::p
+ p:::::p     p:::::p
+ p:::::p    p::::::p
+ p:::::ppppp:::::::p
+ p::::::::::::::::p
+ p::::::::::::::pp
+ p::::::pppppppp
+ p:::::p
+ p:::::p
+p:::::::p
+p:::::::p
+p:::::::p
+ppppppppp
+
+
+
+
+
+
+
+   qqqqqqqqq   qqqqq
+  q:::::::::qqq::::q
+ q:::::::::::::::::q
+q::::::qqqqq::::::qq
+q:::::q     q:::::q
+q:::::q     q:::::q
+q:::::q     q:::::q
+q::::::q    q:::::q
+q:::::::qqqqq:::::q
+ q::::::::::::::::q
+  qq::::::::::::::q
+    qqqqqqqq::::::q
+            q:::::q
+            q:::::q
+           q:::::::q
+           q:::::::q
+           q:::::::q
+           qqqqqqqqq
+
+
+
+
+
+
+
+rrrrr   rrrrrrrrr
+r::::rrr:::::::::r
+r:::::::::::::::::r
+rr::::::rrrrr::::::r
+ r:::::r     r:::::r
+ r:::::r     rrrrrrr
+ r:::::r
+ r:::::r
+ r:::::r
+ r:::::r
+ r:::::r
+ rrrrrrr
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ssssssssss
+  ss::::::::::s
+ss:::::::::::::s
+s::::::ssss:::::s
+ s:::::s  ssssss
+   s::::::s
+      s::::::s
+ssssss   s:::::s
+s:::::ssss::::::s
+s::::::::::::::s
+ s:::::::::::ss
+  sssssssssss
+
+
+
+
+
+
+
+
+
+         tttt
+      ttt:::t
+      t:::::t
+      t:::::t
+ttttttt:::::ttttttt
+t:::::::::::::::::t
+t:::::::::::::::::t
+tttttt:::::::tttttt
+      t:::::t
+      t:::::t
+      t:::::t
+      t:::::t    tttttt
+      t::::::tttt:::::t
+      tt::::::::::::::t
+        tt:::::::::::tt
+          ttttttttttt
+
+
+
+
+
+
+
+
+
+
+
+
+
+uuuuuu    uuuuuu
+u::::u    u::::u
+u::::u    u::::u
+u::::u    u::::u
+u::::u    u::::u
+u::::u    u::::u
+u::::u    u::::u
+u:::::uuuu:::::u
+u:::::::::::::::uu
+ u:::::::::::::::u
+  uu::::::::uu:::u
+    uuuuuuuu  uuuu
+
+
+
+
+
+
+
+
+
+
+
+
+
+vvvvvvv           vvvvvvv
+ v:::::v         v:::::v
+  v:::::v       v:::::v
+   v:::::v     v:::::v
+    v:::::v   v:::::v
+     v:::::v v:::::v
+      v:::::v:::::v
+       v:::::::::v
+        v:::::::v
+         v:::::v
+          v:::v
+           vvv
+
+
+
+
+
+
+
+
+
+
+
+
+
+wwwwwww           wwwww           wwwwwww
+ w:::::w         w:::::w         w:::::w
+  w:::::w       w:::::::w       w:::::w
+   w:::::w     w:::::::::w     w:::::w
+    w:::::w   w:::::w:::::w   w:::::w
+     w:::::w w:::::w w:::::w w:::::w
+      w:::::w:::::w   w:::::w:::::w
+       w:::::::::w     w:::::::::w
+        w:::::::w       w:::::::w
+         w:::::w         w:::::w
+          w:::w           w:::w
+           www             www
+
+
+
+
+
+
+
+
+
+
+
+
+
+xxxxxxx      xxxxxxx
+ x:::::x    x:::::x
+  x:::::x  x:::::x
+   x:::::xx:::::x
+    x::::::::::x
+     x::::::::x
+     x::::::::x
+    x::::::::::x
+   x:::::xx:::::x
+  x:::::x  x:::::x
+ x:::::x    x:::::x
+xxxxxxx      xxxxxxx
+
+
+
+
+
+
+
+
+
+
+
+
+
+yyyyyyy           yyyyyyy
+ y:::::y         y:::::y
+  y:::::y       y:::::y
+   y:::::y     y:::::y
+    y:::::y   y:::::y
+     y:::::y y:::::y
+      y:::::y:::::y
+       y:::::::::y
+        y:::::::y
+         y:::::y
+        y:::::y
+       y:::::y
+      y:::::y
+     y:::::y
+    y:::::y
+   y:::::y
+  yyyyyyy
+
+
+
+
+
+
+
+
+zzzzzzzzzzzzzzzzz
+z:::::::::::::::z
+z::::::::::::::z
+zzzzzzzz::::::z
+      z::::::z
+     z::::::z
+    z::::::z
+   z::::::z
+  z::::::zzzzzzzz
+ z::::::::::::::z
+z:::::::::::::::z
+zzzzzzzzzzzzzzzzz

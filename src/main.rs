@@ -77,16 +77,30 @@ fn main() -> Result<()> {
 
     let mut screen = Screen::new(term_size);
 
+    //Show a funky splashscreen
     for y in 0.. term_size.1 {
         for x in 0.. term_size.0 {
-            let value = 'x';
-            screen.set((x, y), (value, Color::White));
-            screen.set_bg((x, y), Color::Blue);
+            let mut value = ' ';
+            if x % 2 == y % 2 { value = '/' }
+            if x % 8 == y % 8 { value = '\\' }
+            if x == 0 || x == term_size.0 - 1 { value = '|' }
+            if y == 0 || y == term_size.1 - 1 { value = '-' }
+
+            // if (y as f32).sin() > (x as f32).tan() { value = '/' } else { value = ' ' }
+            // if (x ^ y) % 2 == 0 {
+            //     value = 'x';
+            // }
+
+            screen.set((x, y), (value, Color::Grey));
+            screen.set_bg((x, y), Color::Black);
         }
     }
+    for (i, c) in "|loading...|".chars().enumerate() {
+        screen.set((i as u16, term_size.1 - 1), (c, Color::Grey));
+    }
     screen.render();
-    thread::sleep(std::time::Duration::from_secs(4));
     screen.flush(term_size, (Color::Reset, Color::Reset));
+    thread::sleep(std::time::Duration::from_secs(3));
 
     let header = "!== terminal_raymarcher v1.0 ";
     let mut idx = 0;
@@ -110,12 +124,12 @@ fn main() -> Result<()> {
     }
 
     let mut scene = Scene::new();
-    let sphere = SDF::new_sphere([0.0, 0.0, 5.0], 1.0, [255, 0, 0]);
+    let sphere = SDF::new_sphere([2.0, 0.0, 5.0], 1.0, [255, 0, 0]);
     scene.distance_fields.push(sphere);
     let plane = SDF::new_plane(-1.0, [255, 255, 255]);
     scene.distance_fields.push(plane);
-    // let cube = SDF::new_cube([0.0, 0.0, 5.0], [0.5, 0.5, 0.5]);
-    // scene.distance_fields.push(cube);
+    let cube = SDF::new_cube([-2.0, 0.0, 5.0], [0.5, 0.5, 0.5], [0, 0, 255]);
+    scene.distance_fields.push(cube);
 
     //TODO: measure deltatime
     'main: loop {
