@@ -126,12 +126,18 @@ fn main() -> Result<()> {
     let _mouse_mode = input().enable_mouse_mode()?;
 
     let mut scene = Scene::new();
-    let sphere = SDF::new_sphere([2.0, 0.0, 5.0], 1.0, [255, 0, 0]);
-    scene.distance_fields.push(sphere);
     let plane = SDF::new_plane(-1.0, [255, 255, 255]);
     scene.distance_fields.push(plane);
-    let cube = SDF::new_cube([-2.0, 0.0, 5.0], [0.5, 0.5, 0.5], [0, 0, 255]);
-    scene.distance_fields.push(cube);
+
+    let sphere = SDF::new_sphere([2.0, 0.0, 5.0], 1.0, [255, 0, 0]);
+    scene.distance_fields.push(sphere);
+    //position, radius/inner radius, colour, rotation
+    let mut rot_x = 0.0;
+    let mut rot_z = 0.0;
+    let torus = SDF::new_torus([-2.0, 0.0, 5.0], [1.0, 0.5], [0, 255, 0], [rot_x, 0.0, rot_z]);
+    scene.distance_fields.push(torus);
+    // let cube = SDF::new_cube([-2.0, 0.0, 5.0], [0.5, 0.5, 0.5], [0, 0, 255]);
+    // scene.distance_fields.push(cube);
 
     //TODO: measure deltatime
     'main: loop {
@@ -152,6 +158,10 @@ fn main() -> Result<()> {
                 screen.set((px, py), scene.march(ray));
             }
         }
+
+        rot_x += 12.5;
+        rot_z += 6.5;
+        scene.distance_fields[2].update_rotation([rot_x, 0.0, rot_z]);
 
         screen.render();
     }
