@@ -5,7 +5,7 @@ use crossterm::{
     execute,
     terminal,
     cursor,
-    input::{input, AsyncReader, InputEvent, KeyEvent},
+    input::{input, AsyncReader, InputEvent, KeyEvent, MouseEvent, MouseButton},
     ExecutableCommand,
     style::{Attribute, Color, SetForegroundColor, SetBackgroundColor, ResetColor},
     Output,
@@ -32,22 +32,16 @@ use vmath::{
 #[derive(Debug)]
 pub enum Event {
     HandleInput(KeyEvent),
+    HandleMouse(MouseEvent),
     QuitGame,
 }
 
 fn next_event(reader: &mut AsyncReader) -> Option<Event> {
-    while let Some(event) = reader.next() {
+    if let Some(event) = reader.next() {
         match event {
-            //Example code commented out
-            // InputEvent::Keyboard(key) => {
-            //     if let Ok(new_direction) = Direction::try_from(key) {
-            //         if snake_direction.can_change_to(new_direction) {
-            //             return Some(Event::UpdateSnakeDirection(new_direction));
-            //         }
-            //     }
-            // }
             InputEvent::Keyboard(KeyEvent::Esc) => return Some(Event::QuitGame),
             InputEvent::Keyboard(key) => return Some(Event::HandleInput(key)),
+            InputEvent::Mouse(mouse) => return Some(Event::HandleMouse(mouse)),
             _ => {}
         }
     }
@@ -63,11 +57,15 @@ fn handle_input(scene: &mut Scene, key: KeyEvent) {
     }
 }
 
+fn handle_mouse(scene: &mut Scene, mouse: MouseEvent) {
+    scene.camera.yaw += 45.0;
+    if mouse == MouseEvent::Press(MouseButton::Left, 1, 1) {
+        scene.camera.yaw += 45.0;
+    }
+}
+
 fn main() -> Result<()> {
     let term_size: (u16, u16) = terminal::size()?;
-
-    let _raw = crossterm::screen::RawScreen::into_raw_mode();
-    let mut stdin = input().read_async();
 
     stdout()
         .execute(SetForegroundColor(Color::Blue))?
@@ -95,12 +93,12 @@ fn main() -> Result<()> {
             screen.set_bg((x, y), Color::Black);
         }
     }
-    for (i, c) in "|loading...|".chars().enumerate() {
+    for (i, c) in "loading assets...".chars().enumerate() {
         screen.set((i as u16, term_size.1 - 1), (c, Color::Grey));
     }
     screen.render();
     screen.flush(term_size, (Color::Reset, Color::Reset));
-    thread::sleep(std::time::Duration::from_secs(3));
+    thread::sleep(std::time::Duration::from_secs(3)); //TODO: Get rid of this, but we need this now to test the loading screen as we have nothing to load yet lol
 
     let header = "!== terminal_raymarcher v1.0 ";
     let mut idx = 0;
@@ -123,6 +121,10 @@ fn main() -> Result<()> {
         }
     }
 
+    let _raw = crossterm::screen::RawScreen::into_raw_mode();
+    let mut stdin = input().read_async();
+    let _mouse_mode = input().enable_mouse_mode()?;
+
     let mut scene = Scene::new();
     let sphere = SDF::new_sphere([2.0, 0.0, 5.0], 1.0, [255, 0, 0]);
     scene.distance_fields.push(sphere);
@@ -133,11 +135,14 @@ fn main() -> Result<()> {
 
     //TODO: measure deltatime
     'main: loop {
-        match next_event(&mut stdin) {
-            Some(Event::HandleInput(key)) => handle_input(&mut scene, key),
-            Some(Event::QuitGame) => break 'main,
-            _ => {}
-        };
+        while let Some(event) = next_event(&mut stdin) {
+            match event {
+                Event::HandleInput(key) => handle_input(&mut scene, key),
+                Event::HandleMouse(mouse) => handle_mouse(&mut scene, mouse),
+                Event::QuitGame => break 'main,
+                _ => {}
+            };
+        }
 
         //Start at 1 so we have a single line as a header
         for py in 1.. term_size.1 {

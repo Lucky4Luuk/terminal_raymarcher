@@ -15,6 +15,8 @@ use crate::rendering::{
 
 use crossterm::style::Color;
 
+const MAX_STEPS: usize = 64;
+
 fn clamp(x: f32, a: f32, b: f32) -> f32 {
     if x < a { return a };
     if x > b { return b };
@@ -89,15 +91,17 @@ impl Scene {
 
     pub fn march(&self, mut ray: Ray) -> (char, Color) {
         let (mut dist, mut idx) = self.get_distance(ray.position);
+        let mut steps = 0;
 
-        while dist > 0.05 {
-            if dist == 4096.0 {
+        while dist > 0.1 && steps < MAX_STEPS {
+            if dist >= 64.0 {
                 return (' ', Color::Red);
             }
             ray.step(dist);
             let (_dist, _idx) = self.get_distance(ray.position);
             dist = _dist;
             idx = _idx;
+            steps += 1;
         }
 
         // return ('x', Color::Red);
@@ -113,7 +117,13 @@ impl Scene {
             let mut intensity = clamp(vmath::vec3_dot(normal, vmath::vec3_neg(vmath::vec3_normalized([0.25, -0.5, 0.5]))), 0.0, 1.0);
             intensity *= clamp(vmath::vec3_dot(normal, vmath::vec3_neg(vmath::vec3_normalized(ray.direction))), 0.0, 1.0);
             let mut value = ' ';
-            let gradient = [':', ';', '1', '?', '%', 'X', '#', '@'];
+            // let gradient_string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>|,.-#+!$%&/()=?*'_:;";
+            let gradient_string = ":;1?$X%#@";
+            // let gradient_string = ".'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+            // let gradient_string = ":;=+*#%@";
+            let gradient: Vec<char> = gradient_string.chars().collect();
+            // let gradient = [':', ';', '1', '?', '$', 'X', '%', '#', '@'];
+            // let gradient = ['.', ':', ';', '+', '=', 'x', 'X', '$', '&'];
             let gradient_idx = (intensity * (gradient.len() + 1) as f32) as usize;
             value = gradient[gradient_idx];
             // if intensity < 0.25 {
