@@ -20,8 +20,8 @@ impl DebugMenu {
             fps: 0.0,
             object_count: 0,
 
-            bg_col: Color::Rgb{r: 50, g: 20, b: 20},
-            fg_col: Color::Rgb{r: 255, g: 0, b: 0},
+            bg_col: Color::Rgb{r: 30, g: 20, b: 50},
+            fg_col: Color::Rgb{r: 120, g: 0, b: 255},
         }
     }
 

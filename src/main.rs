@@ -177,7 +177,7 @@ fn main() -> Result<()> {
 
         let deltatime_ms = start.elapsed().expect("Time went backwards!!").as_millis();
         deltatime = (deltatime_ms as f32) / 1000.0;
-        debug_menu.update_fps(1000.0 / (deltatime as f32));
+        debug_menu.update_fps(1.0 / deltatime);
         debug_menu.update_obj_count(scene.distance_fields.len());
     }
 
