@@ -1,5 +1,6 @@
 use std::io::{stdout, Write};
 use std::{thread, time};
+use std::time::SystemTime;
 
 use crossterm::{
     execute,
@@ -22,6 +23,7 @@ pub mod rendering;
 use rendering::{
     screen::Screen,
     raymarching as rm,
+    debug_menu::DebugMenu,
 };
 
 extern crate vecmath as vmath;
@@ -57,10 +59,10 @@ fn handle_input(scene: &mut Scene, key: KeyEvent) {
     }
 }
 
-fn handle_mouse(scene: &mut Scene, mouse: MouseEvent) {
-    scene.camera.yaw += 45.0;
+//TODO: Look into this, for some reason I can only get it to work on linux
+fn handle_mouse(debug_menu: &mut DebugMenu, mouse: MouseEvent) {
     if mouse == MouseEvent::Press(MouseButton::Left, 1, 1) {
-        scene.camera.yaw += 45.0;
+        debug_menu.folded = !debug_menu.folded;
     }
 }
 
@@ -74,6 +76,8 @@ fn main() -> Result<()> {
         .execute(cursor::DisableBlinking)?;
 
     let mut screen = Screen::new(term_size);
+    let mut debug_menu = DebugMenu::new();
+    let mut deltatime = 0.0; //In seconds
 
     //Show a funky splashscreen
     for y in 0.. term_size.1 {
@@ -98,7 +102,7 @@ fn main() -> Result<()> {
     }
     screen.render();
     screen.flush(term_size, (Color::Reset, Color::Reset));
-    thread::sleep(std::time::Duration::from_secs(3)); //TODO: Get rid of this, but we need this now to test the loading screen as we have nothing to load yet lol
+    thread::sleep(std::time::Duration::from_secs(0)); //TODO: Get rid of this, but we need this now to test the loading screen as we have nothing to load yet lol
 
     let header = "!== terminal_raymarcher v1.0 ";
     let mut idx = 0;
@@ -123,7 +127,7 @@ fn main() -> Result<()> {
 
     let _raw = crossterm::screen::RawScreen::into_raw_mode();
     let mut stdin = input().read_async();
-    let _mouse_mode = input().enable_mouse_mode()?;
+    input().enable_mouse_mode()?;
 
     let mut scene = Scene::new();
     let plane = SDF::new_plane(-1.0, [255, 255, 255]);
@@ -133,18 +137,21 @@ fn main() -> Result<()> {
     scene.distance_fields.push(sphere);
     //position, radius/inner radius, colour, rotation
     let mut rot_x = 0.0;
+    let mut rot_y = 0.0;
     let mut rot_z = 0.0;
-    let torus = SDF::new_torus([-2.0, 0.0, 5.0], [1.0, 0.5], [0, 255, 0], [rot_x, 0.0, rot_z]);
+    let torus = SDF::new_torus([-2.0, 0.0, 5.0], [1.0, 0.5], [0, 255, 0], [rot_x, rot_y, rot_z]);
     scene.distance_fields.push(torus);
     // let cube = SDF::new_cube([-2.0, 0.0, 5.0], [0.5, 0.5, 0.5], [0, 0, 255]);
     // scene.distance_fields.push(cube);
 
     //TODO: measure deltatime
     'main: loop {
+        let start = SystemTime::now();
+
         while let Some(event) = next_event(&mut stdin) {
             match event {
                 Event::HandleInput(key) => handle_input(&mut scene, key),
-                Event::HandleMouse(mouse) => handle_mouse(&mut scene, mouse),
+                Event::HandleMouse(mouse) => handle_mouse(&mut debug_menu, mouse),
                 Event::QuitGame => break 'main,
                 _ => {}
             };
@@ -159,11 +166,19 @@ fn main() -> Result<()> {
             }
         }
 
-        rot_x += 12.5;
-        rot_z += 6.5;
-        scene.distance_fields[2].update_rotation([rot_x, 0.0, rot_z]);
+        rot_x -= 100.5 * deltatime;
+        rot_y -= 20.5 * deltatime;
+        rot_z += 60.5 * deltatime;
+        scene.distance_fields[2].update_rotation([rot_x, rot_y, rot_z]);
+
+        debug_menu.render(&mut screen);
 
         screen.render();
+
+        let deltatime_ms = start.elapsed().expect("Time went backwards!!").as_millis();
+        deltatime = (deltatime_ms as f32) / 1000.0;
+        debug_menu.update_fps(1000.0 / (deltatime as f32));
+        debug_menu.update_obj_count(scene.distance_fields.len());
     }
 
     stdout()
@@ -171,6 +186,8 @@ fn main() -> Result<()> {
         .execute(Output("Thanks for using!"))?
         .execute(cursor::EnableBlinking)?
         .execute(ResetColor)?;
+
+    input().disable_mouse_mode()?;
 
     Ok(())
 }

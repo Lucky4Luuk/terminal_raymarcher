@@ -61,29 +61,31 @@ impl Screen {
     }
 
     //TODO: Error handling lol
+    //NOTE: I made it ever so slightly faster on windows, by making it output the entire screen
+    //      at once, however, on linux, this completely breaks everything
     pub fn render(&self) {
         // stdout()
         //     .execute(terminal::Clear(terminal::ClearType::All)).unwrap();
         stdout()
             .execute(cursor::MoveTo(0,0)).unwrap();
-        let mut s = String::new();
+        // let mut s = String::new();
         for y in 0.. self.size.1 {
             //Following commented line allows for very fast grayscale output, if the type if char and not (char, Color)
             // let mut s: String = self.buffer[y as usize].iter().collect();
-            // let mut s = String::new();
+            let mut s = String::new();
             for x in 0.. self.size.0 {
                 let (value, color, bg_col) = self.buffer[y as usize][x as usize];
                 s.push_str(&*format!("{}", SetBackgroundColor(bg_col)));
                 s.push_str(&*format!("{}", SetForegroundColor(color)));
                 s.push(value);
             }
-            if y < self.size.1 - 1 {
-                s.push('\n');
-            }
-            // stdout()
-            //     .execute(Output(s)).unwrap();
+            // if y < self.size.1 - 1 {
+            //     s.push('\n');
+            // }
+            stdout()
+                .execute(Output(s)).unwrap();
         }
-        stdout()
-            .execute(Output(s)).unwrap();
+        // stdout()
+        //     .execute(Output(s)).unwrap();
     }
 }
