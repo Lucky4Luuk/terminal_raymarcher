@@ -31,6 +31,8 @@ use vmath::{
     Vector3,
 };
 
+const THREAD_COUNT: u16 = 8;
+
 fn clamp(x: u16, a: u16, b: u16) -> u16 {
     if x < a { return a };
     if x > b { return b };
@@ -157,25 +159,25 @@ fn main() -> Result<()> {
     let mut stdin = input().read_async();
     input().enable_mouse_mode()?;
 
-    let mut scene = Scene::new();
+    let mut scene_originator = Scene::new();
     let plane = SDF::new_plane(-1.0, [255, 255, 255]);
-    scene.push_sdf(plane);
+    scene_originator.push_sdf(plane);
     // scene.distance_fields.push(plane);
 
     let sphere = SDF::new_sphere([2.0, 0.0, 5.0], 1.0, [255, 0, 0]);
-    scene.push_sdf(sphere);
+    scene_originator.push_sdf(sphere);
     // scene.distance_fields.push(sphere);
     //position, radius/inner radius, colour, rotation
     let mut rot_x = 0.0;
     let mut rot_y = 0.0;
     let mut rot_z = 0.0;
     let torus = SDF::new_torus([-2.0, 0.0, 5.0], [1.0, 0.5], [0, 255, 0], [rot_x, rot_y, rot_z]);
-    scene.push_sdf(torus);
+    scene_originator.push_sdf(torus);
     // scene.distance_fields.push(torus);
     // let cube = SDF::new_cube([-2.0, 0.0, 5.0], [0.5, 0.5, 0.5], [0, 0, 255]);
     // scene.distance_fields.push(cube);
 
-    let mut scene_clone = scene.clone();
+    let mut scene = scene_originator.clone();
 
     //TODO: measure deltatime
     'main: loop {
@@ -190,28 +192,22 @@ fn main() -> Result<()> {
             };
         }
 
-        //Start at 1 so we have a single line as a header
-        // for py in 1.. term_size.1 {
-        //     for px in 0.. term_size.0 {
-        //         //Send out a ray
-        //         let ray = scene.generate_ray(term_size, px, py);
-        //         (*screen_handle).set((px, py), scene.march(ray));
-        //     }
-        // }
-        let threads_y = 1;
-        let threads_x = term_size.0 / 8 + 1;
+        let mut thread_width = term_size.0 / THREAD_COUNT;
         let mut handles = vec![];
 
-        for tx in 0..threads_x {
-            //for ty in 0..threads_y {
+        for tx in 0..THREAD_COUNT {
             let screen = Arc::clone(&screen_arc);
 
-            let camera_yaw = scene_clone.camera.yaw;
-            let scene_handle = scene_clone.clone();
+            let camera_yaw = scene.camera.yaw;
+            let scene_handle = scene.clone();
+
+            //This needs to here to ensure we actually fill the entire screen
+            if THREAD_COUNT * thread_width < term_size.0 {
+                thread_width += term_size.0 - THREAD_COUNT * thread_width;
+            }
 
             let handle = thread::spawn(move || {
-                for px in clamp(tx * 8, 0, term_size.0) .. clamp(tx * 8 + 8, 0, term_size.0) {
-                    //for py in clamp(ty * 8, 1, term_size.1) .. clamp(ty * 8 + 8, 1, term_size.1) {
+                for px in clamp(tx * thread_width, 0, term_size.0) .. clamp(tx * thread_width + thread_width, 0, term_size.0) {
                     for py in 1..term_size.1 {
                         let ray = generate_ray(camera_yaw, term_size, px, py);
                         let ray_result = scene_handle.march(ray);
@@ -221,8 +217,6 @@ fn main() -> Result<()> {
                 }
             });
             handles.push(handle);
-
-            //}
         }
 
         for handle in handles {
@@ -233,7 +227,7 @@ fn main() -> Result<()> {
         rot_y -= 20.5 * deltatime;
         rot_z += 60.5 * deltatime;
         // scene.distance_fields[2].update_rotation([rot_x, rot_y, rot_z]);
-        scene_clone.update_rotation(2, [rot_x, rot_y, rot_z]);
+        scene.update_rotation(2, [rot_x, rot_y, rot_z]);
 
         let screen = Arc::clone(&screen_arc);
         let mut screen_handle = screen.lock().unwrap();
