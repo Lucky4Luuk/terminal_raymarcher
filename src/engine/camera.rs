@@ -3,6 +3,7 @@ use vmath::{
     Vector3,
 };
 
+#[derive(Copy, Clone)]
 pub struct Camera {
     pub eye: Vector3<f32>,
     pub yaw: f32,

@@ -23,6 +23,7 @@ fn clamp(x: f32, a: f32, b: f32) -> f32 {
     return x;
 }
 
+#[derive(Clone)]
 pub struct Scene {
     pub distance_fields: Vec<distance_field::SDF>,
     pub camera: Camera,
@@ -34,6 +35,14 @@ impl Scene {
             distance_fields: Vec::new(),
             camera: Camera::new([0.0, 0.0, 0.0], 0.0, 0.0),
         }
+    }
+
+    pub fn push_sdf(&mut self, sdf: distance_field::SDF) {
+        self.distance_fields.push(sdf);
+    }
+
+    pub fn update_rotation(&mut self, idx: usize, rotation: Vector3<f32>) {
+        self.distance_fields[idx].update_rotation(rotation);
     }
 
     pub fn get_distance(&self, position: Vector3<f32>) -> (f32, i32) {

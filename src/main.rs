@@ -1,9 +1,10 @@
-use std::io::{stdout, Write};
-use std::{thread, time};
+use crate::rendering::raymarching::Ray;
+use std::io::stdout;
+use std::thread;
 use std::time::SystemTime;
+use std::sync::{Mutex, Arc};
 
 use crossterm::{
-    execute,
     terminal,
     cursor,
     input::{input, AsyncReader, InputEvent, KeyEvent, MouseEvent, MouseButton},
@@ -22,7 +23,6 @@ use engine::{
 pub mod rendering;
 use rendering::{
     screen::Screen,
-    raymarching as rm,
     debug_menu::DebugMenu,
 };
 
@@ -30,6 +30,12 @@ extern crate vecmath as vmath;
 use vmath::{
     Vector3,
 };
+
+fn clamp(x: u16, a: u16, b: u16) -> u16 {
+    if x < a { return a };
+    if x > b { return b };
+    return x;
+}
 
 #[derive(Debug)]
 pub enum Event {
@@ -61,9 +67,25 @@ fn handle_input(scene: &mut Scene, key: KeyEvent) {
 
 //TODO: Look into this, for some reason I can only get it to work on linux
 fn handle_mouse(debug_menu: &mut DebugMenu, mouse: MouseEvent) {
-    if mouse == MouseEvent::Press(MouseButton::Left, 1, 1) {
+    if mouse == MouseEvent::Press(MouseButton::Left, 0, 1) ||
+        mouse == MouseEvent::Press(MouseButton::Left, 1, 1) ||
+        mouse == MouseEvent::Press(MouseButton::Left, 2, 1) {
         debug_menu.folded = !debug_menu.folded;
     }
+}
+
+pub fn generate_ray(camera_yaw: f32, term_size: (u16, u16), px: u16, py: u16) -> Ray {
+    let fc = ((term_size.0 - px) as f32, (term_size.1 - py) as f32);
+    let p = ((-(term_size.0 as f32) + 2.0 * fc.0) / (term_size.1 as f32), (-(term_size.1 as f32) + 2.0 * fc.1) / (term_size.1 as f32));
+    let mut ray = Ray::new([0.0, 0.0, 0.0], vmath::vec3_normalized([p.0 * 0.5, p.1, 2.0]));
+
+    let r = camera_yaw / 180.0 * 3.14;
+    let dx = ray.direction[0] * r.cos() - ray.direction[2] * r.sin();
+    let dy = ray.direction[2] * r.cos() + ray.direction[0] * r.sin();
+    ray.direction[0] = -dx;
+    ray.direction[2] = dy;
+
+    return ray;
 }
 
 fn main() -> Result<()> {
@@ -75,52 +97,58 @@ fn main() -> Result<()> {
         .execute(ResetColor)?
         .execute(cursor::DisableBlinking)?;
 
-    let mut screen = Screen::new(term_size);
+    // let mut screen = Screen::new(term_size);
+    let mut screen_arc = Arc::new(Mutex::new(Screen::new(term_size)));
     let mut debug_menu = DebugMenu::new();
     let mut deltatime = 0.0; //In seconds
 
-    //Show a funky splashscreen
-    for y in 0.. term_size.1 {
-        for x in 0.. term_size.0 {
-            let mut value = ' ';
-            if x % 2 == y % 2 { value = '/' }
-            if x % 8 == y % 8 { value = '\\' }
-            if x == 0 || x == term_size.0 - 1 { value = '|' }
-            if y == 0 || y == term_size.1 - 1 { value = '-' }
+    let screen = Arc::clone(&screen_arc);
+    {
+        let mut screen_handle = screen.lock().unwrap();
 
-            // if (y as f32).sin() > (x as f32).tan() { value = '/' } else { value = ' ' }
-            // if (x ^ y) % 2 == 0 {
-            //     value = 'x';
-            // }
+        //Show a funky splashscreen
+        for y in 0.. term_size.1 {
+            for x in 0.. term_size.0 {
+                let mut value = ' ';
+                if x % 2 == y % 2 { value = '/' }
+                if x % 8 == y % 8 { value = '\\' }
+                if x == 0 || x == term_size.0 - 1 { value = '|' }
+                if y == 0 || y == term_size.1 - 1 { value = '-' }
 
-            screen.set((x, y), (value, Color::Grey));
-            screen.set_bg((x, y), Color::Black);
+                // if (y as f32).sin() > (x as f32).tan() { value = '/' } else { value = ' ' }
+                // if (x ^ y) % 2 == 0 {
+                //     value = 'x';
+                // }
+
+                (*screen_handle).set((x, y), (value, Color::Grey));
+                (*screen_handle).set_bg((x, y), Color::Black);
+            }
         }
-    }
-    for (i, c) in "loading assets...".chars().enumerate() {
-        screen.set((i as u16, term_size.1 - 1), (c, Color::Grey));
-    }
-    screen.render();
-    screen.flush(term_size, (Color::Reset, Color::Reset));
-    thread::sleep(std::time::Duration::from_secs(0)); //TODO: Get rid of this, but we need this now to test the loading screen as we have nothing to load yet lol
-
-    let header = "!== terminal_raymarcher v1.0 ";
-    let mut idx = 0;
-    for c in header.chars() {
-        screen.set((idx, 0), (c, Color::Red));
-        idx += 1;
-        if idx >= term_size.0 {
-            break;
+        for (i, c) in "loading assets...".chars().enumerate() {
+            (*screen_handle).set((i as u16, term_size.1 - 1), (c, Color::Grey));
         }
-    }
-    if idx < term_size.0 {
-        for i in idx..term_size.0 {
-            if i < term_size.0 - 1 {
-                screen.set((i, 0), ('=', Color::Red));
-            } else if i == term_size.0 - 1 {
-                screen.set((i, 0), ('!', Color::Red));
-            } else {
+        (*screen_handle).render();
+        (*screen_handle).flush(term_size, (Color::Reset, Color::Reset));
+        thread::sleep(std::time::Duration::from_secs(0)); //TODO: Get rid of this, but we need this now to test the loading screen as we have nothing to load yet lol
+
+        let header = "!== terminal_raymarcher v1.0 ";
+        let mut idx = 0;
+        for c in header.chars() {
+            (*screen_handle).set((idx, 0), (c, Color::Red));
+            idx += 1;
+            if idx >= term_size.0 {
                 break;
+            }
+        }
+        if idx < term_size.0 {
+            for i in idx..term_size.0 {
+                if i < term_size.0 - 1 {
+                    (*screen_handle).set((i, 0), ('=', Color::Red));
+                } else if i == term_size.0 - 1 {
+                    (*screen_handle).set((i, 0), ('!', Color::Red));
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -131,59 +159,97 @@ fn main() -> Result<()> {
 
     let mut scene = Scene::new();
     let plane = SDF::new_plane(-1.0, [255, 255, 255]);
-    scene.distance_fields.push(plane);
+    scene.push_sdf(plane);
+    // scene.distance_fields.push(plane);
 
     let sphere = SDF::new_sphere([2.0, 0.0, 5.0], 1.0, [255, 0, 0]);
-    scene.distance_fields.push(sphere);
+    scene.push_sdf(sphere);
+    // scene.distance_fields.push(sphere);
     //position, radius/inner radius, colour, rotation
     let mut rot_x = 0.0;
     let mut rot_y = 0.0;
     let mut rot_z = 0.0;
     let torus = SDF::new_torus([-2.0, 0.0, 5.0], [1.0, 0.5], [0, 255, 0], [rot_x, rot_y, rot_z]);
-    scene.distance_fields.push(torus);
+    scene.push_sdf(torus);
+    // scene.distance_fields.push(torus);
     // let cube = SDF::new_cube([-2.0, 0.0, 5.0], [0.5, 0.5, 0.5], [0, 0, 255]);
     // scene.distance_fields.push(cube);
 
+    let mut scene_clone = scene.clone();
+
     //TODO: measure deltatime
     'main: loop {
-        let start = SystemTime::now();
+        let start = SystemTime::now(); //TODO: check if using Instant isn't better
 
         while let Some(event) = next_event(&mut stdin) {
             match event {
                 Event::HandleInput(key) => handle_input(&mut scene, key),
                 Event::HandleMouse(mouse) => handle_mouse(&mut debug_menu, mouse),
                 Event::QuitGame => break 'main,
-                _ => {}
+                _ => {} //Technically doesn't get used at all, but it allows us to implement future events without writing code here
             };
         }
 
         //Start at 1 so we have a single line as a header
-        for py in 1.. term_size.1 {
-            for px in 0.. term_size.0 {
-                //Send out a ray
-                let ray = scene.generate_ray(term_size, px, py);
-                screen.set((px, py), scene.march(ray));
-            }
+        // for py in 1.. term_size.1 {
+        //     for px in 0.. term_size.0 {
+        //         //Send out a ray
+        //         let ray = scene.generate_ray(term_size, px, py);
+        //         (*screen_handle).set((px, py), scene.march(ray));
+        //     }
+        // }
+        let threads_y = 1;
+        let threads_x = term_size.0 / 8 + 1;
+        let mut handles = vec![];
+
+        for tx in 0..threads_x {
+            //for ty in 0..threads_y {
+            let screen = Arc::clone(&screen_arc);
+
+            let camera_yaw = scene_clone.camera.yaw;
+            let scene_handle = scene_clone.clone();
+
+            let handle = thread::spawn(move || {
+                for px in clamp(tx * 8, 0, term_size.0) .. clamp(tx * 8 + 8, 0, term_size.0) {
+                    //for py in clamp(ty * 8, 1, term_size.1) .. clamp(ty * 8 + 8, 1, term_size.1) {
+                    for py in 1..term_size.1 {
+                        let ray = generate_ray(camera_yaw, term_size, px, py);
+                        let ray_result = scene_handle.march(ray);
+                        let mut screen_handle = screen.lock().unwrap();
+                        (*screen_handle).set((px, py), ray_result);
+                    }
+                }
+            });
+            handles.push(handle);
+
+            //}
+        }
+
+        for handle in handles {
+            handle.join().unwrap();
         }
 
         rot_x -= 100.5 * deltatime;
         rot_y -= 20.5 * deltatime;
         rot_z += 60.5 * deltatime;
-        scene.distance_fields[2].update_rotation([rot_x, rot_y, rot_z]);
+        // scene.distance_fields[2].update_rotation([rot_x, rot_y, rot_z]);
+        scene_clone.update_rotation(2, [rot_x, rot_y, rot_z]);
 
-        debug_menu.render(&mut screen);
+        let screen = Arc::clone(&screen_arc);
+        let mut screen_handle = screen.lock().unwrap();
+        debug_menu.render(&mut (*screen_handle));
 
-        screen.render();
+        (*screen_handle).render();
 
         let deltatime_ms = start.elapsed().expect("Time went backwards!!").as_millis();
         deltatime = (deltatime_ms as f32) / 1000.0;
         debug_menu.update_fps(1.0 / deltatime);
-        debug_menu.update_obj_count(scene.distance_fields.len());
+        // debug_menu.update_obj_count(scene.distance_fields.len());
     }
 
     stdout()
         .execute(SetForegroundColor(Color::Blue))?
-        .execute(Output("Thanks for using!"))?
+        .execute(Output("Thanks for using!\n\r"))?
         .execute(cursor::EnableBlinking)?
         .execute(ResetColor)?;
 

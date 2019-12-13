@@ -22,6 +22,7 @@ fn max(x: f32, a: f32) -> f32 {
     return x;
 }
 
+#[derive(Copy, Clone)]
 pub enum SDF_Type {
     SDF_Sphere,
     SDF_Box,
@@ -29,6 +30,7 @@ pub enum SDF_Type {
     SDF_Plane,
 }
 
+#[derive(Copy, Clone)]
 pub struct SDF {
     pub position: Vector3<f32>,
     pub size: Vector3<f32>,
