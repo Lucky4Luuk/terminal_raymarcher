@@ -37,8 +37,10 @@ impl Scene {
         }
     }
 
-    pub fn push_sdf(&mut self, sdf: distance_field::SDF) {
+    pub fn push_sdf(&mut self, sdf: distance_field::SDF) -> usize {
+        let idx = self.distance_fields.len();
         self.distance_fields.push(sdf);
+        idx
     }
 
     pub fn update_rotation(&mut self, idx: usize, rotation: Vector3<f32>) {

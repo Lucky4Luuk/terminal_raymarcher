@@ -1,4 +1,5 @@
-use crate::rendering::screen::Screen;
+// use crate::rendering::screen::Screen;
+use crate::TerminalRaymarcher;
 
 use crossterm::{
     style::Color,
@@ -33,38 +34,38 @@ impl DebugMenu {
         self.object_count = object_count;
     }
 
-    pub fn render(&self, screen: &mut Screen) {
+    pub fn render(&self, tm: &mut TerminalRaymarcher) {
         if self.folded {
-            screen.set((0,1), ('[', self.fg_col));
-            screen.set((1,1), ('+', self.fg_col));
-            screen.set((2,1), (']', self.fg_col));
+            tm.set((0,1), ('[', self.fg_col));
+            tm.set((1,1), ('+', self.fg_col));
+            tm.set((2,1), (']', self.fg_col));
             for ix in 0..14 {
                 for iy in 1..5 {
-                    screen.set_bg((ix,iy), Color::Reset);
+                    tm.set_bg((ix,iy), Color::Reset);
                 }
             }
-            screen.set_bg((0,1), self.bg_col);
-            screen.set_bg((1,1), self.bg_col);
-            screen.set_bg((2,1), self.bg_col);
+            tm.set_bg((0,1), self.bg_col);
+            tm.set_bg((1,1), self.bg_col);
+            tm.set_bg((2,1), self.bg_col);
 
         } else {
             for ix in 0..14 {
                 for iy in 1..5 {
-                    screen.set_bg((ix,iy), self.bg_col);
+                    tm.set_bg((ix,iy), self.bg_col);
                 }
-                screen.set((ix,1), ('-', self.fg_col));
-                screen.set((ix,4), ('-', self.fg_col));
+                tm.set((ix,1), ('-', self.fg_col));
+                tm.set((ix,4), ('-', self.fg_col));
 
-                screen.set((0,1), ('[', self.fg_col));
-                screen.set((1,1), ('-', self.fg_col));
-                screen.set((2,1), (']', self.fg_col));
+                tm.set((0,1), ('[', self.fg_col));
+                tm.set((1,1), ('-', self.fg_col));
+                tm.set((2,1), (']', self.fg_col));
 
                 for (i, c) in format!("fps: {}", (self.fps * 100.0).floor() / 100.0).chars().enumerate() {
-                    screen.set((i as u16, 2), (c, self.fg_col));
+                    tm.set((i as u16, 2), (c, self.fg_col));
                 }
 
                 for (i, c) in format!("objs: {}", self.object_count).chars().enumerate() {
-                    screen.set((i as u16, 3), (c, self.fg_col));
+                    tm.set((i as u16, 3), (c, self.fg_col));
                 }
             }
         }

@@ -39,6 +39,7 @@ impl Screen {
         }
     }
 
+    //TODO: Remove term_size parameter and replace it with self.size
     pub fn flush(&mut self, term_size: (u16, u16), colors: (Color, Color)) {
         self.buffer = Vec::new();
 
