@@ -134,6 +134,8 @@ fn main() -> Result<()> {
     let mut deltatime = 0.0; //In seconds
     let header = "!== terminal_raymarcher v1.0 ";
 
+    debug_menu.term_size = term_size;
+
     'main: loop {
         let start = SystemTime::now();
 
@@ -178,7 +180,7 @@ fn main() -> Result<()> {
         let deltatime_ms = start.elapsed().expect("Time went backwards!!").as_millis();
         deltatime = (deltatime_ms as f32) / 1000.0;
         debug_menu.update_fps(1.0 / deltatime);
-        debug_menu.update_obj_count(tm.get_object_count())
+        debug_menu.update_obj_count(tm.get_object_count());
     }
 
     tm.quit()?;

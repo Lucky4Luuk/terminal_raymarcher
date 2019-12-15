@@ -1,4 +1,3 @@
-// use crate::rendering::screen::Screen;
 use crate::TerminalRaymarcher;
 
 use crossterm::{
@@ -6,12 +5,13 @@ use crossterm::{
 };
 
 pub struct DebugMenu {
-    pub folded: bool,
     pub fps: f32,
     pub object_count: usize,
+    pub term_size: (u16, u16),
 
     pub bg_col: Color,
     pub fg_col: Color,
+    pub folded: bool,
 }
 
 impl DebugMenu {
@@ -20,6 +20,7 @@ impl DebugMenu {
             folded: true,
             fps: 0.0,
             object_count: 0,
+            term_size: (0,0),
 
             bg_col: Color::Rgb{r: 30, g: 20, b: 50},
             fg_col: Color::Rgb{r: 120, g: 0, b: 255},
@@ -40,7 +41,7 @@ impl DebugMenu {
             tm.set((1,1), ('+', self.fg_col));
             tm.set((2,1), (']', self.fg_col));
             for ix in 0..14 {
-                for iy in 1..5 {
+                for iy in 1..6 {
                     tm.set_bg((ix,iy), Color::Reset);
                 }
             }
@@ -50,11 +51,11 @@ impl DebugMenu {
 
         } else {
             for ix in 0..14 {
-                for iy in 1..5 {
+                for iy in 1..6 {
                     tm.set_bg((ix,iy), self.bg_col);
                 }
                 tm.set((ix,1), ('-', self.fg_col));
-                tm.set((ix,4), ('-', self.fg_col));
+                tm.set((ix,5), ('-', self.fg_col));
 
                 tm.set((0,1), ('[', self.fg_col));
                 tm.set((1,1), ('-', self.fg_col));
@@ -66,6 +67,10 @@ impl DebugMenu {
 
                 for (i, c) in format!("objs: {}", self.object_count).chars().enumerate() {
                     tm.set((i as u16, 3), (c, self.fg_col));
+                }
+
+                for (i, c) in format!("res: {};{}", self.term_size.0, self.term_size.1).chars().enumerate() {
+                    tm.set((i as u16, 4), (c, self.fg_col));
                 }
             }
         }
